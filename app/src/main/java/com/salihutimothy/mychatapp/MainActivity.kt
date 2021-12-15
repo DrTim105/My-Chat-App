@@ -10,7 +10,9 @@ import android.util.Log
 import android.widget.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import de.hdodenhof.circleimageview.CircleImageView
 import java.util.*
 
@@ -21,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var loginPage: TextView
     private lateinit var selectPhoto: Button
     private lateinit var selectImage: CircleImageView
+    private lateinit var registerName: EditText
     private lateinit var registerEmail: EditText
     private lateinit var registerPassword: EditText
 
@@ -114,35 +117,35 @@ class MainActivity : AppCompatActivity() {
 
         ref.putFile(selectedPhotoUri!!)
             .addOnSuccessListener {
-                Log.d(TAG, "Successfully uploaded image: ${it.metadata?.path}")
+                Log.d("TAG", "Successfully uploaded image: ${it.metadata?.path}")
 
                 ref.downloadUrl.addOnSuccessListener {
-                    Log.d(TAG, "File Location: $it")
+                    Log.d("TAG", "File Location: $it")
 
                     saveUserToFirebaseDatabase(it.toString())
                 }
             }
             .addOnFailureListener {
-                Log.d(TAG, "Failed to upload image to storage: ${it.message}")
+                Log.d("TAG", "Failed to upload image to storage: ${it.message}")
             }
     }
 
     private fun saveUserToFirebaseDatabase(profileImageUrl: String) {
+        registerName = findViewById(R.id.username_edittext_register)
         val uid = FirebaseAuth.getInstance().uid ?: ""
         val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
 
-        val user = User(uid, username_edittext_register.text.toString(), profileImageUrl)
+        val user = User(uid, registerName.text.toString(), profileImageUrl)
 
         ref.setValue(user)
             .addOnSuccessListener {
-                Log.d(TAG, "Finally we saved the user to Firebase Database")
+                Log.d("TAG", "Finally we saved the user to Firebase Database")
             }
             .addOnFailureListener {
-                Log.d(TAG, "Failed to set value to database: ${it.message}")
+                Log.d("TAG", "Failed to set value to database: ${it.message}")
             }
     }
 
 }
 
 class User(val uid: String, val username: String, val profileImageUrl: String)
-}
