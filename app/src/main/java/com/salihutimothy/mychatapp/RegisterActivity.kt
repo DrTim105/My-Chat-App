@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_register)
 
         auth = Firebase.auth
         registerButton = findViewById(R.id.register_button_register)
@@ -73,8 +73,6 @@ class MainActivity : AppCompatActivity() {
 
             selectPhoto.alpha = 0f
 
-//      val bitmapDrawable = BitmapDrawable(bitmap)
-//      selectphoto_button_register.setBackgroundDrawable(bitmapDrawable)
         }
     }
 
@@ -140,6 +138,10 @@ class MainActivity : AppCompatActivity() {
         ref.setValue(user)
             .addOnSuccessListener {
                 Log.d("TAG", "Finally we saved the user to Firebase Database")
+
+                val intent = Intent(this, LatestMessagesActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
             }
             .addOnFailureListener {
                 Log.d("TAG", "Failed to set value to database: ${it.message}")
