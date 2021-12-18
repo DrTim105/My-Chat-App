@@ -1,18 +1,21 @@
-package com.salihutimothy.mychatapp
+package com.salihutimothy.mychatapp.registerlogin
 
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.salihutimothy.mychatapp.R
+import com.salihutimothy.mychatapp.messages.LatestMessagesActivity
+import com.salihutimothy.mychatapp.models.User
 import de.hdodenhof.circleimageview.CircleImageView
 import java.util.*
 
@@ -150,6 +153,3 @@ class RegisterActivity : AppCompatActivity() {
 
 }
 
-class User(val uid: String, val username: String, val profileImageUrl: String) {
-    constructor() : this("", "", "")
-}

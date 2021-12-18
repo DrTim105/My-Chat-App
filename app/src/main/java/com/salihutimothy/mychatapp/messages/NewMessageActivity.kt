@@ -1,21 +1,20 @@
-package com.salihutimothy.mychatapp
+package com.salihutimothy.mychatapp.messages
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.squareup.picasso.Picasso
+import com.salihutimothy.mychatapp.R
+import com.salihutimothy.mychatapp.models.User
+import com.salihutimothy.mychatapp.views.UserItem
 import com.xwray.groupie.GroupAdapter
-import com.xwray.groupie.Item
 import com.xwray.groupie.ViewHolder
-import de.hdodenhof.circleimageview.CircleImageView
 
 class NewMessageActivity : AppCompatActivity() {
 
@@ -58,9 +57,9 @@ class NewMessageActivity : AppCompatActivity() {
 
                     val userItem = item as UserItem
 
-//                    val intent = Intent(view.context, ChatLogActivity::class.java)
-//                    intent.putExtra(USER_KEY, userItem.user)
-//                    startActivity(intent)
+                    val intent = Intent(view.context, ChatLogActivity::class.java)
+                    intent.putExtra(USER_KEY, userItem.user)
+                    startActivity(intent)
 
                     finish()
 
@@ -77,18 +76,3 @@ class NewMessageActivity : AppCompatActivity() {
 
 }
 
-class UserItem(private val user: User): Item<ViewHolder>() {
-    override fun bind(viewHolder: ViewHolder, position: Int) {
-
-       val userName = viewHolder.itemView.findViewById<TextView>(R.id.username_textview_new_message)
-        val userImage = viewHolder.itemView.findViewById<CircleImageView>(R.id.imageview_new_message)
-        userName.text = user.username
-
-
-        Picasso.get().load(user.profileImageUrl).into(userImage)
-    }
-
-    override fun getLayout(): Int {
-        return R.layout.user_row
-    }
-}

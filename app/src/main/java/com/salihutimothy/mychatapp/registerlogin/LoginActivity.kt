@@ -1,4 +1,4 @@
-package com.salihutimothy.mychatapp
+package com.salihutimothy.mychatapp.registerlogin
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +9,8 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.salihutimothy.mychatapp.messages.LatestMessagesActivity
+import com.salihutimothy.mychatapp.R
 
 class LoginActivity : AppCompatActivity() {
 

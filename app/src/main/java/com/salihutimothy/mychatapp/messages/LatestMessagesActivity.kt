@@ -1,4 +1,4 @@
-package com.salihutimothy.mychatapp
+package com.salihutimothy.mychatapp.messages
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +12,9 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.salihutimothy.mychatapp.R
+import com.salihutimothy.mychatapp.registerlogin.RegisterActivity
+import com.salihutimothy.mychatapp.models.User
 
 class LatestMessagesActivity : AppCompatActivity() {
 
