@@ -4,8 +4,12 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/SALIHU TIMOTHY/AndroidStudioProjects/MyChatApp/app/src/main/res/drawable/rounded_select_photo_button.xml" value="0.2203125" />
+        <entry key="..\:/Users/SALIHU TIMOTHY/AndroidStudioProjects/MyChatApp/app/src/main/res/layout/activity_latest_messages.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/SALIHU TIMOTHY/AndroidStudioProjects/MyChatApp/app/src/main/res/layout/activity_login.xml" value="0.19010416666666666" />
         <entry key="..\:/Users/SALIHU TIMOTHY/AndroidStudioProjects/MyChatApp/app/src/main/res/layout/activity_main.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/SALIHU TIMOTHY/AndroidStudioProjects/MyChatApp/app/src/main/res/layout/activity_new_message.xml" value="0.19010416666666666" />
+        <entry key="..\:/Users/SALIHU TIMOTHY/AndroidStudioProjects/MyChatApp/app/src/main/res/layout/user_row.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/SALIHU TIMOTHY/AndroidStudioProjects/MyChatApp/app/src/main/res/menu/nav_menu.xml" value="0.20416666666666666" />
       </map>
     </option>
   </component>

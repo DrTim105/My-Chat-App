@@ -16,7 +16,7 @@ import com.google.firebase.storage.FirebaseStorage
 import de.hdodenhof.circleimageview.CircleImageView
 import java.util.*
 
-class MainActivity : AppCompatActivity() {
+class RegisterActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var registerButton: Button
@@ -141,7 +141,7 @@ class MainActivity : AppCompatActivity() {
 
                 val intent = Intent(this, LatestMessagesActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
+//                startActivity(intent)
             }
             .addOnFailureListener {
                 Log.d("TAG", "Failed to set value to database: ${it.message}")
@@ -150,4 +150,6 @@ class MainActivity : AppCompatActivity() {
 
 }
 
-class User(val uid: String, val username: String, val profileImageUrl: String)
+class User(val uid: String, val username: String, val profileImageUrl: String) {
+    constructor() : this("", "", "")
+}
