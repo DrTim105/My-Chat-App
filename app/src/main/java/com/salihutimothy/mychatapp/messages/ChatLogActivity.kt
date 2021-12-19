@@ -3,23 +3,17 @@ package com.salihutimothy.mychatapp.messages
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
-import androidx.core.app.NavUtils
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.salihutimothy.mychatapp.R
 import com.salihutimothy.mychatapp.models.ChatMessage
 import com.salihutimothy.mychatapp.models.User
-import com.salihutimothy.mychatapp.views.ChatFromItem
-import com.salihutimothy.mychatapp.views.ChatToItem
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
@@ -34,12 +28,12 @@ class ChatLogActivity : AppCompatActivity() {
 
     var toUser: User? = null
 
-    private lateinit var chatLog : RecyclerView
-    private lateinit var sendMessage : Button
-    private lateinit var chatMessage : EditText
-    private lateinit var toUserName : TextView
-    private lateinit var toUserImage : CircleImageView
-    private lateinit var toolbar : Toolbar
+    private lateinit var chatLog: RecyclerView
+    private lateinit var sendMessage: Button
+    private lateinit var chatText: EditText
+    private lateinit var toUserName: TextView
+    private lateinit var toUserImage: CircleImageView
+    private lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +47,8 @@ class ChatLogActivity : AppCompatActivity() {
         sendMessage = findViewById(R.id.send_button_chat_log)
         toUserName = findViewById(R.id.to_user_name)
         toUserImage = findViewById(R.id.to_user_image)
+        chatText = findViewById(R.id.edittext_chat_log)
+
         val adapter = GroupAdapter<ViewHolder>()
 
 //        adapter.add(ChatFromItem())
@@ -76,7 +72,6 @@ class ChatLogActivity : AppCompatActivity() {
         Picasso.get().load(toUser?.profileImageUrl).into(toUserImage)
 
 //        listenForMessages()
-
 
 
         sendMessage.setOnClickListener {
@@ -127,31 +122,36 @@ class ChatLogActivity : AppCompatActivity() {
 //    }
 
     private fun performSendMessage() {
-        chatMessage = findViewById(R.id.edittext_chat_log)
-        val text = chatMessage.text.toString()
+        chatText = findViewById(R.id.edittext_chat_log)
+        chatLog = findViewById(R.id.recyclerview_chat_log)
+        val text = chatText.text.toString()
 
         val fromId = FirebaseAuth.getInstance().uid
         val user = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
-        val toId = user?.uid
+        val toId = user!!.uid
 
         if (fromId == null) return
 
-        val reference = FirebaseDatabase.getInstance().getReference("/messages").push()
+        val reference =
+            FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId").push()
 
-        val chatMessage = toId?.let {
-            ChatMessage(
-                reference.key!!,
-                text,
-                fromId,
-                it,
-                System.currentTimeMillis() / 1000
-            )
-        }
+        val toReference =
+            FirebaseDatabase.getInstance().getReference("/user-messages/$toId/$fromId").push()
+
+        val chatMessage =
+            ChatMessage(reference.key!!, text, fromId, toId, System.currentTimeMillis() / 1000)
+
         reference.setValue(chatMessage)
-            .addOnSuccessListener {
+            .addOnCompleteListener {
                 Log.d(TAG, "Saved our chat message: ${reference.key}")
+                chatText.text.clear()
+                chatLog.scrollToPosition(adapter.itemCount - 1)
             }
-    }
+            .addOnFailureListener {
+                Log.d(TAG, "failed to save message")
+            }
 
+        toReference.setValue(chatMessage)
+    }
 
 }
