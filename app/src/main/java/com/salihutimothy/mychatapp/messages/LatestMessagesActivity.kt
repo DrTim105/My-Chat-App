@@ -19,7 +19,7 @@ import com.salihutimothy.mychatapp.models.User
 class LatestMessagesActivity : AppCompatActivity() {
 
     companion object {
-        var currentUser: User? = null
+        var  currentUser: User? = null
     }
 
     private lateinit var newChat: FloatingActionButton

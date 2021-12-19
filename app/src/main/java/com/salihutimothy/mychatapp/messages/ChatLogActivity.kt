@@ -10,10 +10,15 @@ import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.salihutimothy.mychatapp.R
 import com.salihutimothy.mychatapp.models.ChatMessage
 import com.salihutimothy.mychatapp.models.User
+import com.salihutimothy.mychatapp.views.ChatFromItem
+import com.salihutimothy.mychatapp.views.ChatToItem
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
@@ -49,20 +54,6 @@ class ChatLogActivity : AppCompatActivity() {
         toUserImage = findViewById(R.id.to_user_image)
         chatText = findViewById(R.id.edittext_chat_log)
 
-        val adapter = GroupAdapter<ViewHolder>()
-
-//        adapter.add(ChatFromItem())
-//        adapter.add(ChatToItem())
-//        adapter.add(ChatFromItem())
-//        adapter.add(ChatFromItem())
-//        adapter.add(ChatToItem())
-//        adapter.add(ChatFromItem())
-//        adapter.add(ChatToItem())
-//        adapter.add(ChatFromItem())
-//        adapter.add(ChatToItem())
-//        adapter.add(ChatToItem())
-//        adapter.add(ChatFromItem())
-//        adapter.add(ChatFromItem())
 
         chatLog.adapter = adapter
 
@@ -71,7 +62,7 @@ class ChatLogActivity : AppCompatActivity() {
         toUserName.text = toUser?.username
         Picasso.get().load(toUser?.profileImageUrl).into(toUserImage)
 
-//        listenForMessages()
+        listenForMessages()
 
 
         sendMessage.setOnClickListener {
@@ -80,78 +71,83 @@ class ChatLogActivity : AppCompatActivity() {
         }
     }
 
-//    private fun listenForMessages() {
-//        val ref = FirebaseDatabase.getInstance().getReference("/messages")
-//
-//        ref.addChildEventListener(object: ChildEventListener {
-//
-//            override fun onChildAdded(p0: DataSnapshot, p1: String?) {
-//                val chatMessage = p0.getValue(ChatMessage::class.java)
-//
-//                if (chatMessage != null) {
-//                    Log.d(TAG, chatMessage.text)
-//
-//                    if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
-//                        val currentUser = LatestMessagesActivity.currentUser ?: return
-//                        adapter.add(ChatFromItem(chatMessage.text, currentUser))
-//                    } else {
-//                        adapter.add(ChatToItem(chatMessage.text, toUser!!))
-//                    }
-//                }
-//
-//            }
-//
-//            override fun onCancelled(p0: DatabaseError) {
-//
-//            }
-//
-//            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-//
-//            }
-//
-//            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
-//
-//            }
-//
-//            override fun onChildRemoved(p0: DataSnapshot) {
-//
-//            }
-//
-//        })
-//
-//    }
+    private fun listenForMessages() {
+        val fromId = FirebaseAuth.getInstance().uid
+        val toId = toUser?.uid
+        val ref = FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId")
+
+        ref.addChildEventListener(object: ChildEventListener {
+
+            override fun onChildAdded(p0: DataSnapshot, p1: String?) {
+                val chatMessage = p0.getValue(ChatMessage::class.java)
+
+                if (chatMessage != null) {
+                    Log.d(TAG, chatMessage.text)
+
+                    if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
+                        val currentUser = LatestMessagesActivity.currentUser ?: return
+                        adapter.add(ChatToItem(chatMessage.text, currentUser))
+                    } else {
+                        adapter.add(ChatFromItem(chatMessage.text, toUser!!))
+                    }
+                }
+
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+
+            }
+
+            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+
+            }
+
+            override fun onChildRemoved(p0: DataSnapshot) {
+
+            }
+
+        })
+
+    }
 
     private fun performSendMessage() {
         chatText = findViewById(R.id.edittext_chat_log)
         chatLog = findViewById(R.id.recyclerview_chat_log)
         val text = chatText.text.toString()
 
-        val fromId = FirebaseAuth.getInstance().uid
-        val user = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
-        val toId = user!!.uid
+        if (text.isNotEmpty()) {
+            val fromId = FirebaseAuth.getInstance().uid
+            val user = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
+            val toId = user!!.uid
 
-        if (fromId == null) return
+            if (fromId == null) return
 
-        val reference =
-            FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId").push()
+            val reference =
+                FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId").push()
 
-        val toReference =
-            FirebaseDatabase.getInstance().getReference("/user-messages/$toId/$fromId").push()
+            val toReference =
+                FirebaseDatabase.getInstance().getReference("/user-messages/$toId/$fromId").push()
 
-        val chatMessage =
-            ChatMessage(reference.key!!, text, fromId, toId, System.currentTimeMillis() / 1000)
+            val chatMessage =
+                ChatMessage(reference.key!!, text, fromId, toId, System.currentTimeMillis() / 1000)
 
-        reference.setValue(chatMessage)
-            .addOnCompleteListener {
-                Log.d(TAG, "Saved our chat message: ${reference.key}")
-                chatText.text.clear()
-                chatLog.scrollToPosition(adapter.itemCount - 1)
-            }
-            .addOnFailureListener {
-                Log.d(TAG, "failed to save message")
-            }
+            reference.setValue(chatMessage)
+                .addOnCompleteListener {
+                    Log.d(TAG, "Saved our chat message: ${reference.key}")
+                    chatText.text.clear()
+                    chatLog.scrollToPosition(adapter.itemCount - 1)
+                }
+                .addOnFailureListener {
+                    Log.d(TAG, "failed to save message")
+                }
 
-        toReference.setValue(chatMessage)
+            toReference.setValue(chatMessage)
+        }
+
     }
 
 }

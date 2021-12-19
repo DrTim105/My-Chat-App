@@ -13,7 +13,7 @@ class ChatFromItem(val text: String, val user: User): Item<ViewHolder>() {
 
         val fromRow = viewHolder.itemView.findViewById<TextView>(R.id.textview_from_row)
 //        val targetImageView = viewHolder.itemView.findViewById<ImageView>(R.id.imageview_chat_from_row)
-//        fromRow.text = text
+        fromRow.text = text
 //
 //        val uri = user.profileImageUrl
 //        Picasso.get().load(uri).into(targetImageView)
