@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
@@ -37,11 +38,26 @@ class LatestMessagesActivity : AppCompatActivity() {
         latestMessageView = findViewById(R.id.recyclerview_latest_messages)
 
         latestMessageView.adapter = adapter
+        latestMessageView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+
+        // set item click listener on your adapter
+        adapter.setOnItemClickListener { item, view ->
+            Log.d("TAG", "123")
+            val intent = Intent(this, ChatLogActivity::class.java)
+
+            // we are missing the chat partner user
+
+            val row = item as LatestMessageRow
+            intent.putExtra(NewMessageActivity.USER_KEY, row.chatPartnerUser)
+            startActivity(intent)
+        }
+
+        listenForLatestMessages()
+
         fetchCurrentUser()
 
         verifyUserIsLoggedIn()
 
-        listenForLatestMessages()
 
         newChat.setOnClickListener {
             val intent = Intent(this, NewMessageActivity::class.java)
