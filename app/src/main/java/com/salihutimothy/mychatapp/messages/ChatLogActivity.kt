@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
@@ -15,6 +16,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.salihutimothy.mychatapp.R
+import com.salihutimothy.mychatapp.messages.LatestMessagesActivity.Companion.currentUser
 import com.salihutimothy.mychatapp.models.ChatMessage
 import com.salihutimothy.mychatapp.models.User
 import com.salihutimothy.mychatapp.views.ChatFromItem
@@ -123,6 +125,8 @@ class ChatLogActivity : AppCompatActivity() {
             val fromId = FirebaseAuth.getInstance().uid
             val user = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
             val toId = user!!.uid
+            val toUsername = toUser?.username
+            val fromUsername = currentUser?.username
 
             if (fromId == null) return
 
@@ -148,12 +152,45 @@ class ChatLogActivity : AppCompatActivity() {
             toReference.setValue(chatMessage)
 
             val latestMessageRef = FirebaseDatabase.getInstance().getReference("/latest-messages/$fromId/$toId")
-            latestMessageRef.setValue(chatMessage)
+
+            val latestFromChatMessage = LatestChatMessage(fromUsername!!, reference.key!!,text, fromId,
+                toId, System.currentTimeMillis() / 1000, false)
+
+            val latestToChatMessage = LatestChatMessage(toUsername!!, reference.key!!,text, fromId,
+                toId, System.currentTimeMillis() / 1000, false)
+
+            latestMessageRef.setValue(latestToChatMessage)
 
             val latestMessageToRef = FirebaseDatabase.getInstance().getReference("/latest-messages/$toId/$fromId")
-            latestMessageToRef.setValue(chatMessage)
+
+            latestMessageToRef.setValue(latestFromChatMessage)
         }
 
     }
 
+    fun keyboardManagement(){
+        // starts chat from bottom
+        val layoutManager = LinearLayoutManager(this)
+        layoutManager.stackFromEnd = true
+        chatLog = findViewById(R.id.recyclerview_chat_log)
+
+        chatLog.layoutManager = layoutManager
+
+        // pushes up recycler view when softkeyboard popups up
+        chatLog.addOnLayoutChangeListener { view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+            if (bottom < oldBottom) {
+                chatLog.postDelayed(Runnable {
+                    chatLog.scrollToPosition(
+                        chatLog.adapter!!.itemCount -1)
+                }, 100)
+            }
+        }
+    }
+
+    class LatestChatMessage(val toUsername:String, val id:String, val message:String, val fromId:String, val toID:String, val timestamp:Long, val messageSeen:Boolean){
+        constructor(): this("","","","","",-1, false)
+    }
+
 }
+
+
