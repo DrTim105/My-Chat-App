@@ -21,6 +21,8 @@ import com.xwray.groupie.ViewHolder
 
 class LatestMessagesActivity : AppCompatActivity() {
 
+    val fromRowMap: MutableMap<String, Int> = mutableMapOf<String, Int>()
+
     companion object {
         var  currentUser: User? = null
     }
@@ -67,7 +69,7 @@ class LatestMessagesActivity : AppCompatActivity() {
 
     val latestMessagesMap =  HashMap<String, ChatMessage>()
 
-    private fun refreshRecyclerViewMessages() {
+    private fun refreshLatestMessages() {
         adapter.clear()
         latestMessagesMap.values.forEach {
             adapter.add(LatestMessageRow(it))
@@ -81,13 +83,13 @@ class LatestMessagesActivity : AppCompatActivity() {
             override fun onChildAdded(p0: DataSnapshot, p1: String?) {
                 val chatMessage = p0.getValue(ChatMessage::class.java) ?: return
                 latestMessagesMap[p0.key!!] = chatMessage
-                refreshRecyclerViewMessages()
+                refreshLatestMessages()
             }
 
             override fun onChildChanged(p0: DataSnapshot, p1: String?) {
                 val chatMessage = p0.getValue(ChatMessage::class.java) ?: return
                 latestMessagesMap[p0.key!!] = chatMessage
-                refreshRecyclerViewMessages()
+                refreshLatestMessages()
             }
 
             override fun onChildMoved(p0: DataSnapshot, p1: String?) {
@@ -99,6 +101,22 @@ class LatestMessagesActivity : AppCompatActivity() {
             override fun onCancelled(p0: DatabaseError) {
 
             }
+        })
+    }
+
+    var latestMessageRow = RowId()
+
+    private fun fetchLatestMessageRow(fromId:String, toId:String){
+        val ref = FirebaseDatabase.getInstance().getReference("/latest-messages-row/$fromId/$toId")
+        ref.addListenerForSingleValueEvent(object: ValueEventListener{
+            override fun onCancelled(p0: DatabaseError) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                latestMessageRow = p0.getValue(RowId::class.java)!!
+            }
+
         })
     }
 
@@ -144,4 +162,8 @@ class LatestMessagesActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.nav_menu, menu)
         return super.onCreateOptionsMenu(menu)
     }
+}
+
+class RowId(val row:Int){
+    constructor(): this(0)
 }

@@ -58,6 +58,7 @@ class ChatLogActivity : AppCompatActivity() {
 
 
         chatLog.adapter = adapter
+        keyboardManagement()
 
         toUser = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
 
@@ -143,7 +144,8 @@ class ChatLogActivity : AppCompatActivity() {
                 .addOnCompleteListener {
                     Log.d(TAG, "Saved our chat message: ${reference.key}")
                     chatText.text.clear()
-                    chatLog.scrollToPosition(adapter.itemCount - 1)
+                    keyboardManagement()
+//                    chatLog.scrollToPosition(adapter.itemCount - 1)
                 }
                 .addOnFailureListener {
                     Log.d(TAG, "failed to save message")
